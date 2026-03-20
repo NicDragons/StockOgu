@@ -4,6 +4,12 @@ def summarize_news(news_text, api_key):
     # 최신 google-genai 패키지 문법 적용
     client = genai.Client(api_key=api_key)
     
+    from datetime import datetime
+    import pytz
+    
+    kst = pytz.timezone('Asia/Seoul')
+    today_str = datetime.now(kst).strftime("%Y년 %m월 %d일 %A")
+
     prompt = f"""
 다음은 방금 스크래핑한 각 분야별 주요 뉴스 헤드라인과 날씨 정보입니다.
 이를 바탕으로 아래 양식에 맞추어 오늘 주요 뉴스 브리핑을 작성해주세요. 
@@ -17,7 +23,7 @@ def summarize_news(news_text, api_key):
 3. 해당 주식이 어떤 '테마주'(예: AI반도체, 2차전지, 웹툰, 로봇 등)에 속하는지 구체적인 이유나 테마 명시
 
 양식 예시: 
-[오늘 날짜, 예: 2026년 3월 18일 수요일] 주요 뉴스 브리핑
+[{today_str}] 주요 뉴스 브리핑
 
 <경 제>
 • [경제 주요 뉴스 브리핑]
