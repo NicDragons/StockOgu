@@ -11,7 +11,8 @@ def main():
     if not gemini_api_key or not telegram_bot_token or not telegram_chat_id:
         print("Missing required environment variables.")
         print("Set GEMINI_API_KEY, TELEGRAM_BOT_TOKEN, and TELEGRAM_CHAT_ID in environment or secrets.")
-        return
+        import sys
+        sys.exit(1)
 
     print("Scraping news...")
     news_text = get_naver_news()
@@ -28,6 +29,8 @@ def main():
         send_telegram_message(telegram_bot_token, telegram_chat_id, summary)
     except Exception as e:
         print(f"Error during summarization or sending: {e}")
+        import sys
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

@@ -19,6 +19,8 @@ def send_telegram_message(bot_token, chat_id, text):
             print(f"Message chunk {i+1} sent successfully")
         else:
             print(f"Failed to send message chunk {i+1}: {res.text}")
+            import sys
+            sys.exit(1)
         
         # 여러 개로 나뉘어 전송될 때 순서가 꼬이지 않도록 1초 대기
         time.sleep(1)
