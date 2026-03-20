@@ -48,21 +48,17 @@ def get_google_news():
     return "\n".join(news_data)
 
 def get_weather_info():
-    url = "https://search.naver.com/search.naver?query=전국오늘날씨"
-    headers = {
-        'User-Agent': 'Mozilla/5.0'
-    }
+    # 네이버 날씨 대신, 서버 IP(해외) 차단이 없는 글로벌 무료 날씨 API(wttr.in) 사용
     try:
-        res = requests.get(url, headers=headers)
-        soup = BeautifulSoup(res.content, 'html.parser')
+        url = "https://wttr.in/Seoul?format=오늘의+서울+날씨:+%C,+현재+기온+%t&lang=ko"
+        res = requests.get(url, timeout=5)
+        res.raise_for_status()
+        weather_text = res.text.strip()
         
-        weather_text = soup.select_one('.temperature_text').text.strip() if soup.select_one('.temperature_text') else ""
-        summary = soup.select_one('.summary').text.strip() if soup.select_one('.summary') else ""
-        
-        if weather_text and summary:
-            return f"[날씨]\n- {weather_text}, {summary}\n"
+        if weather_text and "Unknown" not in weather_text:
+            return f"[날씨]\n- {weather_text}\n"
     except Exception as e:
-        print(f"Error scraping weather: {e}")
+        print(f"Error getting weather: {e}")
     
     return "[날씨]\n- 오늘 날씨 정보를 가져올 수 없습니다.\n"
 
