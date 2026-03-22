@@ -2,9 +2,9 @@ name: Daily Morning News Bot
 
 on:
   schedule:
-    # 12:00 UTC is 21:00 KST (저녁 9시)
-    # 23:00 UTC is 08:00 KST (아침 8시)
-    - cron: '0 12,23 * * *'
+    # 11:00 UTC is 20:00 KST (오후 8시)
+    # 22:00 UTC is 07:00 KST (오전 7시)
+    - cron: '0 11,22 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 jobs:

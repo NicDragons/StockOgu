@@ -20,17 +20,27 @@ def main():
     
     combined_text = news_text + "\n" + weather_text
     
-    print("Summarizing with Gemini...")
-    try:
-        summary = summarize_news(combined_text, gemini_api_key)
-        print("Summary generated.")
-        
-        print("Sending message to Telegram...")
-        send_telegram_message(telegram_bot_token, telegram_chat_id, summary)
-    except Exception as e:
-        print(f"Error during summarization or sending: {e}")
-        import sys
-        sys.exit(1)
+    print("Summarizing with Gemini and sending to Telegram...")
+    max_retries = 2
+    for attempt in range(max_retries):
+        try:
+            summary = summarize_news(combined_text, gemini_api_key)
+            print("Summary generated.")
+            
+            print("Sending message to Telegram...")
+            send_telegram_message(telegram_bot_token, telegram_chat_id, summary)
+            print("Successfully processed and sent.")
+            break  # 성공 시 루프 탈출, 재발송 방지
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                print("Retrying in 5 seconds...")
+                import time
+                time.sleep(5)
+            else:
+                print("Max retries reached. Exiting.")
+                import sys
+                sys.exit(1)
 
 if __name__ == "__main__":
     main()
