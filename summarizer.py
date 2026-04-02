@@ -76,3 +76,71 @@ def summarize_news(news_text, api_key):
             contents=prompt
         )
         return response.text
+
+def summarize_breaking_news(news_text, api_key):
+    # 최신 google-genai 패키지 문법 적용
+    client = genai.Client(api_key=api_key)
+    
+    from datetime import datetime
+    import pytz
+    
+    kst = pytz.timezone('Asia/Seoul')
+    now_kst = datetime.now(kst)
+    today_str = now_kst.strftime('%Y년 %m월 %d일 %H시 %M분')
+
+    prompt = f"""
+[할루시네이션(환각) 절대 금지]
+입력된 긴급/속보 뉴스 데이터에 기반해서만 작성하세요. 
+
+다음은 방금 스크래핑한 (트럼프, 미국, 이란, 이스라엘) 관련 긴급/속보 뉴스입니다.
+이를 바탕으로 아래 양식에 맞추어 속보 브리핑을 작성해주세요.
+사용자가 읽기 편하고 자연스러운 문장 ('~습니다/니다')으로 작성해야 합니다.
+
+[중요 요청사항]
+1. 뉴스의 내용을 먼저 요약해주세요. 여러 개의 속보가 있다면 각각의 내용을 가독성 있게 줄바꿈(bullet point 등)으로 분리해 작성해주세요.
+2. 해당 속보로 인해 단기적으로 변동성이 예상되는 관련 주식을 **국내 주식 10개, 해외 주식 10개** (반드시 각각 10개씩) 추천해주세요. 
+3. 종목을 추천할 때 이미 주가가 많이 오른 유명한 [대장주] 뿐만 아니라, 상대적으로 가벼운 [저평가/수혜주]를 섞어주세요.
+
+[주식 추천 표기 규칙]
+1. 추천 주식은 [관련 국내 주식 10선]과 [관련 해외 주식 10선]으로 목록을 완전히 분리해서 작성해주세요.
+2. 종목 번호 바로 뒤에 '주식 이름'이 가장 먼저 확실하게 나오도록 작성해주세요.
+3. 상승 여파가 높을 것으로 예상된다면 주식 이름 앞에 '🟢' (초록색) 이모지를, 하락 여파가 크다면 '🔴' (빨간색) 이모지를 반드시 붙여주세요. (예: 🟢한화에어로스페이스)
+4. 주식 이름 바로 옆 소괄호 안에 (시장/종목종류) 형식으로 표기해주세요. 예: (코스피/대장주) 또는 (나스닥/수혜주)
+5. 그 다음 줄에 하이픈(-)으로 시작하여 왜 상승/하락을 예상하는지 구체적인 이유를 설명해주세요.
+
+양식 예시: 
+🚨 [{today_str}] 긴급/속보 브리핑 🚨
+
+<속보 요약>
+• [속보 내용 1 요약]
+• [속보 내용 2 요약]
+
+💡 [관련 국내 주식 10선]
+1. 🟢관련주A (코스피/대장주)
+- [상승/하락 이유에 대한 구체적인 설명]
+... (총 10개)
+
+💡 [관련 해외 주식 10선]
+1. 🔴관련주B (나스닥/저평가수혜주)
+- [상승/하락 이유에 대한 구체적인 설명]
+... (총 10개)
+
+---
+스크래핑된 속보 데이터:
+{news_text}
+"""
+    
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+        return response.text
+    except Exception as e:
+        print(f"gemini-2.5-flash 모델 속보 에러: {e}")
+        response = client.models.generate_content(
+            model='gemini-flash-latest',
+            contents=prompt
+        )
+        return response.text
+
